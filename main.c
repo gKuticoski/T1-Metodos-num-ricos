@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <math.h>
 #include <string.h>
+#include <fenv.h>
 
 void show_bit_pattern(float number, char *bitPattern)
 {
@@ -26,9 +26,12 @@ void show_bit_pattern(float number, char *bitPattern)
 
 int main(int argc, char *argv[])
 {
+    fenv_t env;
+    fegetenv(&env);
+
     if (argc != 4)
     {
-        printf("A entrade deve possuir o formato: %s val1 op val2\n", argv[0]);
+        printf("A entrada deve possuir o formato: %s val1 op val2\n", argv[0]);
         return 1;
     }
 
@@ -67,5 +70,13 @@ int main(int argc, char *argv[])
 
     show_bit_pattern(result, bitPattern);
     printf("res  : %s = %f\n\n", bitPattern, result);
+
+    int flags = fetestexcept(FE_ALL_EXCEPT);
+    printf("Exceção FE_INEXACT: %d\n", (flags & FE_INEXACT) ? FE_INEXACT : 0);
+    printf("Exceção FE_DIVBYZERO: %d\n", (flags & FE_DIVBYZERO) ? FE_DIVBYZERO : 0);
+    printf("Exceção FE_UNDERFLOW: %d\n", (flags & FE_UNDERFLOW) ? FE_UNDERFLOW : 0);
+    printf("Exceção FE_OVERFLOW: %d\n", (flags & FE_OVERFLOW) ? FE_OVERFLOW : 0);
+    printf("Exceção FE_INVALID: %d\n", (flags & FE_INVALID) ? FE_INVALID : 0);
+
     return 0;
 }
